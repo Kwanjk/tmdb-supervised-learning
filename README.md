@@ -1,40 +1,44 @@
-🎬 What Makes a Movie “Timeless”?
-A Data + Machine Learning Analysis using TMDB Metadata (200 Movies)
+# 🎬 What Makes a Movie *Timeless*?
+### A Data + Machine Learning Analysis Using TMDB Metadata (200 Movies)
 
 This project explores a surprisingly difficult question:
 
-What makes a movie timeless — a film that stays culturally relevant long after its release?
+## **What makes a movie timeless — a film that stays culturally relevant long after its release?**
 
-Using 200 of the most-popular movies on TMDB, I scraped detailed metadata, engineered features, and trained a supervised logistic regression model to analyze which factors most strongly predict whether a movie endures or fades.
+Using a dataset of 200 high-engagement films scraped directly from the TMDB API, I collected metadata, engineered features, and trained a supervised logistic regression model to analyze which factors most strongly predict whether a movie endures or fades.
 
-This repo contains:
+---
 
-✔ The Python notebook used to scrape TMDB, clean data, build features, and train the model
+# 📦 Repo Contents
 
-✔ All figures, charts, and insights referenced in the Medium article
+✔ **Jupyter Notebook** — scraping TMDB, cleaning data, engineering features, training the ML model  
+✔ **All visualizations** referenced in the Medium article  
+✔ **Final Medium write-up** (linked below)  
+✔ **Reproducible ML workflow** for cultural longevity analysis  
 
-✔ A direct link to the final write-up
+---
 
-✔ A reproducible ML pipeline for analyzing cultural longevity 
+# 🔗 Medium Article — Final Submission
 
-🔗 Medium Article (Final Submission)
-
-“What Makes a Movie Timeless? Using Data and Supervised Learning to Find Out”
-👉 https://medium.com/@kwanjosh25/what-makes-a-movie-timeless-a-data-driven-look-using-tmdb-and-supervised-learning-9eff432fac6e 
+**“What Makes a Movie Timeless? Using Data and Supervised Learning to Find Out”**  
+👉 https://medium.com/@kwanjosh25/what-makes-a-movie-timeless-a-data-driven-look-using-tmdb-and-supervised-learning-9eff432fac6e  
 
 This README is designed to accompany and reinforce that article.
 
-📂 Project Structure
+---
 
-📁 timeless-movies/
-│── tmdb_timeless_movies.csv        # 200-row cleaned dataset
-│── movie_timeless_analysis.ipynb   # Full scraping + ML notebook
-│── visuals/                        # Saved plots used in article
-│── README.md                       # (this file)
+# 📂 Project Structure
 
-🎯 Goal
+| Path / File | Description |
+|-------------|-------------|
+| `tmdb_timeless_movies.csv` | 200-row cleaned dataset |
+| `movie_timeless_analysis.ipynb` | Full scraping + ML notebook |
+| `visuals/` | Folder containing saved plots used in the article |
+| `README.md` | This file |
 
-Identify non-obvious patterns in popular films that help explain why some movies become timeless while others are forgotten — and explore how ML can support decisions such as:
+# 🎯 Project Goal
+
+Identify **non-obvious** patterns in popular films that help explain why some movies become timeless while others fade — and explore how machine learning can support decisions such as:
 
 - film studio investment
 
@@ -46,9 +50,11 @@ Identify non-obvious patterns in popular films that help explain why some movies
 
 - long-term content licensing
 
-📊 Dataset Overview
+# 📊 Dataset Overview
 
-The dataset was built programmatically using the TMDB API, collecting metadata for 200 high-engagement films, each tagged with:
+The dataset was created programmatically using the TMDB API, collecting metadata for **200 films**, including:
+
+### Audience Metrics
 
 - vote_average
 
@@ -56,213 +62,169 @@ The dataset was built programmatically using the TMDB API, collecting metadata f
 
 - popularity
 
-- budget / revenue
+### Economic Metrics
+
+- budget
+
+- revenue
+
+### Content Features
+
+- one-hot encoded genre_ids
+
+- cast_size
+
+- production_companies
 
 - runtime
 
-- release year, movie_age
+### Temporal
 
-- genre IDs → one-hot vectors
+- release_year
 
-- cast size
+- movie_age
 
-- production companies
+- Target Label
 
-- manually assigned “timeless” label (0 or 1)
+- timeless — manually assigned (0 or 1)
 
-Counts:
+Class Breakdown
+Total films: 200
+Timeless = 26
+Not timeless = 174
+This strong imbalance influences model performance and evaluation.
 
-- Total films: 200
+# 🧹 Data Collection & Cleaning 
 
-- Timeless = 26
-
-- Not timeless = 174
-
-This imbalance influences modeling — and is handled explicitly in the Medium article.
-
-🧹 Data Collection & Cleaning
-✔ Scraping (Python + TMDB API)
-
-Functions written using:
-import requests
+### ✔ Scraping (Python + TMDB API)
+Libraries used:
+```import requests
 import pandas as pd
+``` 
+Scraping process:
 
-Steps included:
+1. Fetch popular movie IDs page-by-page
+2. Query /movie/{id} to pull metadata
+3. Query /movie/{id}/credits for cast size
+4. Extract + normalize nested JSON fields
+5. Convert genre_ids to one-hot vectors
+6. Engineer features (movie_age, cast_size)
+7. Append results into a structured DataFrame
+Example record creation:
+```record = {
+    "id": movie_id,
+    "title": details.get("title"),
+    "release_date": details.get("release_date"),
+    "release_year": int(details.get("release_date", "0000")[:4]) 
+                    if details.get("release_date") else None,
+    "budget": details.get("budget"),
+    "revenue": details.get("revenue"),
+    "runtime": details.get("runtime"),
+    "popularity": details.get("popularity"),
+    "vote_average": details.get("vote_average"),
+    "vote_count": details.get("vote_count"),
+    "genre_ids": [g["id"] for g in details.get("genres", [])],
+    "production_companies": len(details.get("production_companies", [])),
+    "cast_size": len(credits.get("cast", [])),
+}
+``` 
 
-Fetching movie IDs page-by-page
+# ✔ Cleaning Steps
+- Filled missing numeric fields with 0
+- Normalized budget/revenue values
+- Handled SettingWithCopyWarning correctly
+- Removed malformed genre metadata
+- Verified no duplicates and validated row count = 200
 
-Pulling metadata, credits, and details
+# 🧠 Modeling Approach
 
-Normalizing JSON structures
+### ✔ Supervised Learning Model
 
-Expanding genre_ids into one-hot columns
+Logistic Regression
 
-Calculating movie_age and cast_size
+### ✔ Why Logistic Regression?
 
-Merging to a single DataFrame
+- The target (timeless) is binary
+- Coefficients provide interpretable insights
+- Handles imbalance with class weights
+- Works well with mixed numerical + one-hot features
 
-✔ Cleaning
-
-Filled missing numeric fields with 0
-
-Removed malformed genre strings
-
-Resolved SettingWithCopyWarning
-
-Normalized revenue/budget scales
-
-Verified no duplicates
-
-Confirmed final row count: 200
-
-🧠 Modeling Approach
-🎯 Supervised Learning
-
-This project uses:
-
-✔ Logistic Regression
-
-Why?
-
-Our target is binary (timeless vs not timeless)
-
-Interpretability is essential
-
-Handles class imbalance with weighting
-
-Works well with mixed numeric + one-hot data
-
-Feature Set Used
-
+### ✔ Feature Groups
 Audience Metrics
 
-vote_average
+vote_average, vote_count, popularity
 
-vote_count
+Economic
 
-popularity
+budget, revenue
 
-Economic Metrics
+Content
 
-budget
-
-revenue
-
-Content Structure
-
-genre one-hots
-
-runtime
-
-cast_size
+Genres (one-hot), runtime, cast_size, production_companies
 
 Temporal
 
 movie_age
 
-Model Evaluation
+### ✔ Evaluation Methods
+- Confusion matrix
+- Classification report
+- Manual inspection of misclassified samples
+- Re-running the notebook to ensure reproducibility
 
-Includes:
+# 🔍 Key Findings
+1. Highly Rated Movies Age Better
 
-Confusion matrix
+vote_average and metrics of audience engagement were top predictors.
 
-Accuracy
+3. Certain Genres Contribute to Longevity
 
-False positive/negative inspection
+Drama, Mystery, Fantasy, and Sci-Fi appeared frequently in timeless films.
 
-Hand-review of 5 misclassified films
+3. Age Matters
 
-🔍 Key Findings
+Older films outperform new releases in timelessness likelihood.
 
-(Full details in Medium article)
+4. Budget Does Not Predict Longevity
 
-🎬 1. Popular + Highly Rated Movies Age Best
+High-budget films often fade; cultural impact matters more.
 
-Vote average and vote count have the strongest positive impact.
+5. Timeless Films Follow Consistent Narrative Archetypes
 
-🎭 2. Drama, Mystery, Fantasy, and Sci-Fi genres have higher timeless probability
+Genre combinations and story structures appear to influence longevity.
 
-Genre mattered more than expected.
-
-⏳ 3. Older movies are more often timeless
-
-Aging exposes whether a film sustains engagement.
-
-🔥 4. Big budgets don’t guarantee longevity
-
-Economic scale ≠ cultural endurance.
-
-🎯 5. Timeless movies cluster around certain “story archetypes”
-
-Partially captured by genre and vote metrics.
-
-🧪 Validation
-
+# 🧪 Validation
 To ensure correctness:
 
-Verified records manually against TMDB
+- Verified random samples against TMDB manually
+- Checked outliers (invalid budgets, missing release years)
+- Hand-reviewed five misclassified films
+- Compared ChatGPT code guidance with notebook output
+- Ran the notebook from scratch to validate reproducibility
 
-Checked outliers (budget errors, malformed release dates)
+# 📉 Limitations
+- Only 200 films — larger datasets may yield more robust patterns
+- Timelessness is subjective (but defined consistently)
+- Class imbalance affects precision for timeless films
+- TMDB popularity may skew toward newer releases
+- Lacks rich textual features like scripts or reviews
 
-Reviewed 5 misclassified samples to interpret model behavior
-
-Compared ChatGPT suggestions with actual notebook output
-
-Re-ran the notebook end-to-end to confirm reproducibility
-
-📉 Limitations
-
-Small dataset (200 rows) limits generalization
-
-Class imbalance affects precision
-
-Timelessness is subjective, based on a consistent definition but still opinion-based
-
-TMDB popularity can skew toward recency
-
-No textual data (scripts, reviews, keywords)
-
-Future improvements listed in the article also apply here.
-
-🧩 Technologies Used
-
-Python
-
-Pandas
-
-NumPy
-
-Matplotlib / Seaborn
-
-Scikit-learn
-
-Requests (for API calls)
-
-Jupyter Notebook
-
-TMDB API
+# 🧰 Technologies Used
+- Python
+- Pandas, NumPy
+- Matplotlib, Seaborn
+- Scikit-learn
+- Requests / TMDB API
+- Jupyter Notebook
 
 This project demonstrates:
-
-Practical data scraping
-
-Feature engineering
-
-Supervised learning
-
-Model interpretation
-
-API integration
-
-Visual storytelling
-
-Research-grade write-up
-
-It pairs a real Medium-ready article with a reproducible ML pipeline.
+- Real API scraping
+- Feature engineering
+- Binary classification modeling
+- Visual storytelling
+- Reproducible data science workflow
 
 🙌 Credits
-
 Dataset collected & curated by Joshua Kwan
 Analysis, visualizations, and writing by Joshua Kwan
-TMDB API used under fair-use academic guidelines
-
+TMDB API used under fair-use academic guidelines.
