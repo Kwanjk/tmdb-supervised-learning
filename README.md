@@ -37,6 +37,89 @@ This README is designed to accompany and reinforce that article.
 | `visuals/` | Folder containing saved plots used in the article |
 | `README.md` | This file |
 
+---
+
+## 🔑 Getting a TMDB API Key
+
+This project uses the TMDB API to collect movie metadata.  
+To run the scraping portion of the notebook, you'll need your own API key.
+
+### 1. Create a TMDB Account
+
+Sign up here:  
+👉 <https://www.themoviedb.org/signup>
+
+### 2. Generate an API Key
+
+After creating an account:
+
+- Go to your profile
+- Click **Settings → API**
+- Under **API Key (v3 Auth)**, click **Request an API Key**
+- Choose **Developer**
+- Fill out the required information
+- Your key will appear under **API Key**
+
+### 3. Store Your Key
+
+Create a `.env` file in the project root:
+
+```
+TMDB_API_KEY=your_key_here
+```
+
+### 4. Load It in Python
+
+The notebook will automatically detect it using `python-dotenv`:
+
+```python
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+API_KEY = os.getenv("TMDB_API_KEY")
+```
+
+If the key is found, all TMDB requests will run properly.
+
+---
+
+## 🎯 Project Goal
+
+🔑 Getting a TMDB API Key
+This project uses the TMDB API to collect movie metadata.
+To run the scraping portion of the notebook, you’ll need your own API key.
+1. Create a TMDB Account
+Sign up here:
+👉 https://www.themoviedb.org/signup
+2. Generate an API Key
+After creating an account:
+Go to your profile
+Click Settings → API
+Under API Key (v3 Auth), click Request an API Key
+Choose Developer
+Fill out the required information
+Your key will appear under API Key
+
+3. Store Your Key
+Create a .env file in the project root:
+
+```
+TMDB_API_KEY=your_key_here
+```
+
+4. Load It in Python
+The notebook will automatically detect it using python-dotenv:
+
+```
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+API_KEY = os.getenv("TMDB_API_KEY")
+``` 
+If the key is found, all TMDB requests will run properly. 
+
 ## 🎯 Project Goal
 
 Identify **non-obvious** patterns in popular films that help explain why some movies become timeless while others fade — and explore how machine learning can support decisions such as:
