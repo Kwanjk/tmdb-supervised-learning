@@ -55,7 +55,7 @@ After creating an account:
 
 - Go to your profile
 - Click **Settings → API**
-- Under **API Key (v3 Auth)**, click **Request an API Key**
+- Under **API Key**, click **Request an API Key**
 - Choose **Developer**
 - Fill out the required information
 - Your key will appear under **API Key**
